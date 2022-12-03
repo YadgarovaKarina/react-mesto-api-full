@@ -1,0 +1,15 @@
+.popup__form-input-error {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 15px;
+    width: 358px;
+    color: #FF0000;
+    height: 29px;
+    border-bottom-color: red;
+}
+
+.popup__form-input-error:focus {
+    outline-color: red;
+}
