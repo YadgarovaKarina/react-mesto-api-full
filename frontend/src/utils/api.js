@@ -11,26 +11,26 @@ export class Api {
         return Promise.reject(`Ошибка: ${res.status}`);
     }
 
-    register(data) {
+    register(email, password) {
         return fetch(`${this._url}/signup`,
           {
             method: 'POST',
             headers: this._headers,
-            body: JSON.stringify(data)
+            body: JSON.stringify({ email, password })
           })
           .then(this._handleResponce)
       };
     
-      login(data) {
+    authorize(email, password) {
         return fetch(`${this._url}/signin`, {
           method: 'POST',
           headers: this._headers,
-          body: JSON.stringify(data)
+          body: JSON.stringify({ email, password })
         })
           .then(this._handleResponce)
       }
     
-      setToken(token) {
+    setToken(token) {
         this._headers.Authorization = `Bearer ${ token }`
       }
 
