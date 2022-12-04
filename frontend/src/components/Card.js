@@ -3,9 +3,8 @@ import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
 const Card = ({ data, onClick, onLike, onDelete }) => {
     const currentUser = React.useContext(CurrentUserContext);
-
-    const isOwn = data.owner._id === currentUser._id;
-    const isLiked = data.likes.some(i => i._id === currentUser._id);
+    const isOwn = data.owner === currentUser._id;
+    const isLiked = data.likes.some(id => id === currentUser._id);
     const cardLikeButtonClassName = (
         `element__like-button ${isLiked ? 'element__like-button_active' : ''}`
     );

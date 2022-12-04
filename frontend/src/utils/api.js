@@ -18,8 +18,8 @@ export class Api {
             headers: this._headers,
             body: JSON.stringify({ email, password })
           })
-          .then(this._handleResponce)
-      };
+          .then(this._handleStatus)
+    };
     
     authorize(email, password) {
         return fetch(`${this._url}/signin`, {
@@ -27,12 +27,12 @@ export class Api {
           headers: this._headers,
           body: JSON.stringify({ email, password })
         })
-          .then(this._handleResponce)
-      }
+          .then(this._handleStatus)
+    }
     
     setToken(token) {
         this._headers.Authorization = `Bearer ${ token }`
-      }
+    }
 
     getInitialCards() {
         return fetch(`${this._url}/cards`, {
@@ -99,9 +99,9 @@ export class Api {
 }
 
 export const api = new Api({
-    url: 'https://mesto.nomoreparties.co/v1/cohort-48',
+    url: 'http://localhost:3000',
     headers: {
-        authorization: 'b8918bb6-8c8c-461f-acb0-f8f8bf54b78b',
+        Authorization: '',
         'Content-Type': 'application/json'
     }
 });

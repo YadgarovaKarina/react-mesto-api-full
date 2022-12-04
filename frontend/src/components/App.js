@@ -12,7 +12,6 @@ import Register from './Register';
 import ProtectedRoute from './ProtectedRoute';
 import error from '../images/error.png';
 import success from '../images/success.png';
-import * as auth from '../utils/auth';
 import { api } from '../utils/api';
 import { defaultCurrentUser, CurrentUserContext } from '../contexts/CurrentUserContext';
 import { Route, Switch, Redirect, useHistory } from 'react-router-dom';
@@ -24,7 +23,6 @@ function App() {
     const [openPopupName, setOpenPopupName] = React.useState('');
     const [selectedCard, setSelectedCard] = React.useState({});
     const [currentUser, setCurrentUser] = React.useState(defaultCurrentUser);
-    const [email, setEmail] = React.useState("");
     const [tooltipInfo, setTooltipInfo] = React.useState({
         image: " ",
         message: " "
@@ -33,13 +31,11 @@ function App() {
     const history = useHistory();
 
     const handleLogin = (email, password) => {
-        return auth.authorize(email, password)
-            .then((data) => {
-                if (!data.token) throw new Error('Missing jwt');
-                localStorage.setItem('jwt', data.token);
+        return api.authorize(email, password)
+            .then(({ token }) => {
+                if (!token) throw new Error('Missing jwt');
+                localStorage.setItem('jwt', token);
                 setLoggedIn(true);
-                setEmail(email);
-                history.push('/');
             })
             .catch((err) => {
                 showInfoPopup({
@@ -51,7 +47,7 @@ function App() {
     };
 
     const handleRegister = (email, password) => {
-        return auth.register(email, password)
+        return api.register(email, password)
             .then(() => {
                 showInfoPopup({
                     image: success,
@@ -76,39 +72,29 @@ function App() {
 
     const tokenCheck = () => {
         const jwt = localStorage.getItem('jwt');
+        api.setToken(jwt);
         if (!jwt) return;
-        auth.getContent(jwt)
-            .then((res) => {
-                setLoggedIn(true);
-                setEmail(res.data.email);
-                history.push("/");
+        Promise.all([api.getUserInfo(), api.getInitialCards()])
+            .then(([user, cards]) => {
+                if (user && user.email) {
+                    setLoggedIn(true);
+                    setCurrentUser(user);
+                    setCards(cards.data);
+                    history.push("/");
+                } else {
+                    handleLogout();
+                }
             })
             .catch((err) => {
+                handleLogout();
                 console.log(err)
             });
     };
 
     React.useEffect(() => {
         tokenCheck();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loggedIn]);
-
-    React.useEffect(() => {
-        api.getInitialCards()
-            .then(cards => setCards(cards))
-            .catch((err) => {
-                console.log(err);
-            })
-    }, []);
-
-    React.useEffect(() => {
-        api.getUserInfo()
-            .then((data) => {
-                setCurrentUser(data)
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-    }, [])
 
     const handleClosePopup = () => {
         setOpenPopupName('');
@@ -159,7 +145,8 @@ function App() {
     };
 
     function handleCardLike(card) {
-        const isLiked = card.likes.some(i => i._id === currentUser._id);
+        console.log(card)
+        const isLiked = card.likes.some(id => id === currentUser._id);
         api.changeLikeCardStatus(card._id, !isLiked)
             .then((newCard) => {
                 setCards((cards) => cards.map((c) => c._id === card._id ? newCard : c));
@@ -194,7 +181,7 @@ function App() {
         <CurrentUserContext.Provider value={currentUser}>
             <Header
                 onLogout={handleLogout}
-                email={email} />
+                email={currentUser.email} />
             <Switch>
                 <ProtectedRoute
                     exact path="/"
