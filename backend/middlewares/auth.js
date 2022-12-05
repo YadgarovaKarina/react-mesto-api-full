@@ -7,8 +7,9 @@ export const auth = (req, res, next) => {
     next(new UnauthorizedError('Необходима авторизация'));
   } else {
     const token = authorization.replace(/^Bearer*\s*/i, '');
+    const { JWT_SECRET } = req.app.get('config');
     try {
-      const decoded = jwt.verify(token, 'some-secret-key');
+      const decoded = jwt.verify(token, JWT_SECRET);
       req.user = { _id: decoded._id };
       next();
     } catch (err) {

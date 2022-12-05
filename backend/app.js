@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import { errors } from 'celebrate';
 import { constants } from 'http2';
 import { NotFoundError } from './errors/NotFoundError.js';
@@ -12,9 +13,13 @@ import { auth } from './middlewares/auth.js';
 import { userBodyValidator, userLoginValidator } from './validators/userValidator.js';
 import { requestLogger, errorLogger } from './middlewares/logger.js';
 
-const { PORT = 3000 } = process.env;
-
 const app = express();
+
+const { PORT = 3000, NODE_ENV = 'development' } = process.env;
+
+const config = dotenv.config({ path: NODE_ENV === 'production' ? '.env' : '.env.common' }).parsed;
+
+app.set('config', config);
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
