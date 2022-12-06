@@ -4,7 +4,6 @@ import User from '../models/user.js';
 import { ServerError } from '../errors/ServerError.js';
 import { BadRequestError } from '../errors/BadRequestError.js';
 import { NotFoundError } from '../errors/NotFoundError.js';
-import { UnauthorizedError } from '../errors/UnauthorizedError.js';
 import { ConflictError } from '../errors/ConflictError.js';
 
 export const getUsers = (req, res, next) => {
@@ -68,9 +67,7 @@ export const login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
       res.send({ token });
     })
-    .catch(() => {
-      next(new UnauthorizedError('Неверный логин или пароль'));
-    });
+    .catch(next);
 };
 
 export const readOne = (req, res, next) => {

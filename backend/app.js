@@ -53,13 +53,13 @@ app.use('/users', userRouter);
 
 app.use('/cards', cardsRouter);
 
-app.use(errorLogger);
-
-app.use(errors());
-
 app.all('/*', (req, res, next) => {
   next(new NotFoundError('Страница не существует'));
 });
+
+app.use(errorLogger);
+
+app.use(errors());
 
 app.use((err, req, res, next) => {
   const status = err.statusCode || constants.HTTP_STATUS_INTERNAL_SERVER_ERROR;
