@@ -99,7 +99,7 @@ export class Api {
 }
 
 export const api = new Api({
-    url: 'http://localhost:3000',
+    url: 'https://yadgarovak-backend.nomoredomains.club',
     headers: {
         Authorization: '',
         'Content-Type': 'application/json'
